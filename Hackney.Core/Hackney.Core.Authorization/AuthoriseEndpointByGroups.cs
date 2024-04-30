@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Hackney.Core.Authorization.Exceptions;
 using Hackney.Core.JWT;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
