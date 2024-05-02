@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoFixture;
 using Hackney.Core.Authorization;
 using FluentAssertions;
+using Hackney.Core.Authorization.Exceptions;
 using Hackney.Core.JWT;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

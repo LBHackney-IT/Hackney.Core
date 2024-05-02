@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Hackney.Core.Authorization.Exceptions;
 using Xunit;
 
 namespace Hackney.Core.Tests.Authorization

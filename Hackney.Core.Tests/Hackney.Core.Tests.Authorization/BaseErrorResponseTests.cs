@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Hackney.Core.Authorization;
 using System.Net;
+using Hackney.Core.Authorization.Exceptions;
 using Xunit;
 
 namespace Hackney.Core.Tests.Authorization
