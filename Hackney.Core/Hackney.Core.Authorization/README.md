@@ -1,6 +1,7 @@
 # Hackney.Core.Authorization NuGet Package
 
-The `Hackney.Core.Authorization` library empowers developers to customize access to API endpoints efficiently.
+The `Hackney.Core.Authorization` library enables developers to customize access to API endpoints. 
+It provides three main features:
 
 ## AuthorizeEndpointByGroups
 
@@ -192,7 +193,7 @@ To use the `UseGoogleGroupAuthorization` middleware, add the following line to y
 	app.UseGoogleGroupAuthorization();
 ```
 
-This middleware will use `REQUIRED_GOOGL_GROUPS` environment valiable to get required Google groups list.
+This middleware will use `REQUIRED_GOOGL_GROUPS` environment variable to get required Google groups list.
 
 ### Testing
 The testing process for `AuthorizeEndpointByIpWhitelist` is similar to that of `AuthorizeEndpointByGroups`. For detailed instructions on how to conduct these tests, please refer to the [Testing section](#testing).
