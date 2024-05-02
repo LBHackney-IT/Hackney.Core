@@ -43,13 +43,7 @@ namespace Hackney.Core.Authorization
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            // Get the remote IP address from the X-Forwarded-For header or the connection if not available
-            if (!context.HttpContext.Request.Headers.TryGetValue("X-Forwarded-For", out var remoteIp))
-            {
-                if (context.HttpContext.Connection.RemoteIpAddress != null)
-                    remoteIp = context.HttpContext.Connection.RemoteIpAddress.ToString();
-            }
-
+            var remoteIp = context.HttpContext.Connection.RemoteIpAddress.ToString();
             _logger.LogInformation("Request from Remote IP address: {RemoteIp}", remoteIp);
 
             if (!_whitelist.Contains(remoteIp))

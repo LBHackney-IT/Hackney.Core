@@ -1,39 +1,29 @@
-﻿# Hackney.Core.Authorization NuGet Package
-This library allows developers to customize access to an API endpoint.
+# Hackney.Core.Authorization NuGet Package
 
-The `Hackney.Core.Authorization` NuGet package has multiple ways to limit access to an API/API endpoint. See below:
+The `Hackney.Core.Authorization` library empowers developers to customize access to API endpoints efficiently.
 
-## AuthorizeByGroups
+## AuthorizeEndpointByGroups
 
-This allows a developer to limit an endpoint so that only users in certain google groups can access it. 
+This feature enables developers to restrict endpoint access to users within specific Google groups.
 
 ### Instructions
 
-1. Make sure your API has registered the `ITokenFactory` service from `Hackney.Core.JWT`. This is usually done in the `Startup.cs` file by adding the following line of code:
+1. **Configure `ITokenFactory`:** Ensure that your API has registered the `ITokenFactory` service from `Hackney.Core.JWT`. Typically, this is done in the `Startup.cs` file by adding the following code:
 	```csharp
 	services.AddTokenFactory();
 	```
 
-2. Set up an environment variable to contain the list of groups that have access to an endpoint. You can name this variable anything you want. The list of groups should be comma-separated, with no whitespaces (unless the group 	name itself has whitespaces). 
-	
-	For example:
+2. **Set Environment Variable:** Define an environment variable containing the list of groups with access to an endpoint. The groups should be comma-separated and have no whitespaces (unless the group name has them)
 	```shell
 	$PATCH_ENDPOINT_GOOGLE_GROUPS="group1,group2,group3,group with whitespace,group4"
 	```
 
 	You can have multiple environment variables if you want different groups to have access to different endpoints.
 	_Note: Make sure you configure this environment variable to be available locally and in your pipeline, through your `serverless.yml` and `appsettings.json` files._
-
-3. Add the authorization filter to your endpoint(s). In your controller methods, add the following line of code:
-	
-	```csharp
-	[AuthorizeEndpointByGroups("<Environment Variable Name>")]
-	```
-
-	For example:
+3. **Apply Authorization Filter:** In your controller methods, add the `[AuthorizeEndpointByGroups("<Environment Variable Name>")]` attribute.
 	```csharp
 	[HttpPost]
-	[AuthorizeByGroups("ALLOWED_GOOGLE_GROUPS_POST")]
+	[AuthorizeEndpointByGroups("ALLOWED_GOOGLE_GROUPS_POST")]
 	public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
 	{
 		 // Your code here
@@ -41,26 +31,19 @@ This allows a developer to limit an endpoint so that only users in certain googl
 	```
 
 	This means that the `CreateUser` endpoint will be limited to the Google groups listed in the `$ALLOWED_GOOGLE_GROUPS_POST` environment variable.
-
 ### Testing
-To test the authorization filters, you can follow these steps:
 
-1. Create a mock JWT token for a fake user with some fake Google groups in it.
-2. Set your environment variable to include the same Google groups as the ones in the JWT token.
-3. Change either the environment variable or the JWT token to have a Google group that doesn't match the other.
+To test authorization filters:
 
-This will allow you to test the authorization filters by simulating different scenarios and verifying that the access to the endpoints is limited correctly.
+1. Create a mock JWT token for a fake user with fake Google groups.
+2. Set the environment variable to include the same Google groups as those in the JWT token.
+3. Modify either the environment variable or the JWT token to include a Google group that doesn't match the other.
 
 ## AuthorizeEndpointByIpWhitelist
 
 ### Instructions
 
-1. Set up an environment variable to contain the list of IP addresses that have access to an endpoint. You can name this variable anything you want.
-	**Format:**
-	- The list of IP addresses should be separated by semi-colons and have no whitespaces.
-	- The IP addresses should be in the dotted-quad notation (`xxx.xxx.xxx.xxx`) for IPv4 or the colon-hexadecimal notation (`xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx`) for IPv6.
-	
-	For example:
+1. **Set Environment Variable:** Define an environment variable containing the list of IP addresses with access to an endpoint. The list should be semi-colon separated. For example:
 	```shell
 	$GET_ENDPOINT_WHITELISTED_IPS="127.0.0.1;243.156.218.37"
 	```
@@ -68,16 +51,10 @@ This will allow you to test the authorization filters by simulating different sc
 	You can have multiple environment variables if you want different groups to have access to different endpoints.
 	_Note: Make sure you configure this environment variable to be available locally and in your pipeline, through your `serverless.yml` and `appsettings.json` files._
 
-3. Add the authorization filter to your endpoint(s). In your controller methods, add the following line of code:
-	
-	```csharp
-	[AuthorizeEndpointByIpWhitelist("<Environment Variable Name>")]
-	```
-
-	For example:
+2. **Apply Authorization Filter:** In your controller methods, add the `[AuthorizeEndpointByIpWhitelist("<Environment Variable Name>")]` attribute. For example:
 	```csharp
 	[HttpGet]
-	["/users/{id}"]
+	[Route("/users/{id}")]
 	[AuthorizeEndpointByIpWhitelist("ALLOWED_IPS_GET")]
 	public async Task<IActionResult> GetUser([FromRoute] Guid id)
 	{
@@ -88,23 +65,128 @@ This will allow you to test the authorization filters by simulating different sc
 	This means that the `GetUser` endpoint will be limited to the IP addresses listed in the `$ALLOWED_IPS_GET` environment variable.
 
 ### Testing
-Mocking your IP address can be difficult, so in your e2e tests you can add the following header:
-```json
-{
-	"X-Forwarded-For": "<Fake IP Address>"
-}
-```
-The code will check this header before checking the source IP Address, allowing you to easily mock your IP address without having to spoof it.
+
+To configure a fake IP address for End-to-End (E2E) testing, follow these steps:
+
+1. **Create a MockWebApplicationFactoryWithMiddleware Class:**
+	Create a `MockWebApplicationFactoryWithMiddleware` class which extends `MockWebApplicationFactory<TStartup>` and allows you to dynamically add middleware to your startup class. Also, set up any environment variables needed.
+
+	```csharp
+	public class MockWebApplicationFactoryWithMiddleware<TStartup> : MockWebApplicationFactory<TStartup> where TStartup : class
+	{
+		 public MockWebApplicationFactoryWithMiddleware() : base()
+		 {
+			  EnsureEnvVarConfigured("ALLOWED_IPS_GET", "127.0.0.1");
+		 }
+
+		 protected override void ConfigureWebHost(IWebHostBuilder builder)
+		 {
+			  base.ConfigureWebHost(builder);
+
+			  builder.ConfigureAppConfiguration(b => b.AddEnvironmentVariables())
+					.UseStartup<MiddlewareConfigurationStartup>();
+
+			  builder.ConfigureServices(services =>
+			  {
+					services.AddSingleton<Action<IApplicationBuilder>>(app =>
+					{
+						 // Add middleware to the pipeline (can have multiple)
+						 app.UseMiddleware<OverrideIpAddressMiddleware>();
+					});
+			  });
+		 }
+	}
+	```
+
+2. **Middleware Configuration:**
+	To allow you to configure middleware in your startup code, create a `MiddlewareConfigurationStartup` class which inherits from `Startup`. 
+	_(You can copy and paste this code directly without any changes)_
+
+	```csharp
+	public class MiddlewareConfigurationStartup : Startup
+	{
+		 public MiddlewareConfigurationStartup(IConfiguration configuration) : base(configuration)
+		 {
+		 }
+
+		 public override void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+		 {
+			  var middlewareConfigurationAction = app.ApplicationServices.GetService<Action<IApplicationBuilder>>();
+			  middlewareConfigurationAction?.Invoke(app);
+
+			  base.Configure(app, env, logger);
+		 }
+	}
+	```
+
+3. **Create Override IP Address Middleware:**
+	The `OverrideIpAddressMiddleware` class is responsible for setting the remote IP address to a fake value. 
+	_(You can copy and paste this code directly without any changes)_
+	Make sure to reference it in the `ConfigureWebHost` method.
+
+	```csharp
+	public class OverrideIpAddressMiddleware
+	{
+		 private readonly RequestDelegate _next;
+
+		 public OverrideIpAddressMiddleware(RequestDelegate next)
+		 {
+			  _next = next;
+		 }
+
+		 public async Task Invoke(HttpContext context)
+		 {
+			  byte[] ipBytes = { 127, 0, 0, 1 };
+			  IPAddress ipAddress = new IPAddress(ipBytes);
+			  context.Connection.RemoteIpAddress = ipAddress;
+			  await _next(context);
+		 }
+	}
+	```
+
+4. **Create an AppTestCollection:**
+	This step involves defining a collection of tests that share a common context. In this case, the context is a `MockWebApplicationFactoryWithMiddleware<Startup>.` This factory sets up a mock web application with middleware for testing.
+
+	```csharp
+	[CollectionDefinition("AppTest middleware collection", DisableParallelization = true)]
+	public class AppTestCollectionMiddleware : ICollectionFixture<MockWebApplicationFactoryWithMiddleware<Startup>>
+	{
+		 // This class has no code, and is never created. Its purpose is simply
+		 // to be the place to apply [CollectionDefinition] and all the
+		 // ICollectionFixture<> interfaces.
+	}
+	```
+
+5. **Update your references in your E2E test.**
+	In your end-to-end (E2E) tests, you need to update the collection reference to use the new `AppTestCollectionMiddleware` you just created. This ensures that the tests use the mocked IP address provided by the middleware.
+
+	For example, if your test class currently looks like this:
+
+	```csharp
+	[Collection("AppTest collection")]
+	// ...
+	public FetchAllContactDetailsTests(MockWebApplicationFactory<Startup> appFactory)
+	```
+	
+	You should update the [Collection] attribute to reference the "AppTest middleware collection", and the `appFactory` parameter to have a type of `MockWebApplicationFactoryWithMiddleware<Startup>`:
+
+	```csharp
+	[Collection("AppTest middleware collection")]
+	// ...
+	public FetchAllContactDetailsTests(MockWebApplicationFactoryWithMiddleware<Startup> appFactory)
+	```
+
+	With this change, the tests in this class will now use the mocked IP address.
 
 ## UseGoogleGroupAuthorization
 
-This allows a developer to limit an *entire* API to the google groups they specify
+This feature enables developers to restrict access to an entire API based on specified Google groups.
 
-Note: The preferred method to manage access to an API is to use the *lambda authorizer*. You can find more information [here](https://playbook.hackney.gov.uk/API-Playbook/lambda_authoriser).
+**Note:** While this method is available, the preferred approach is using the lambda authorizer. Refer to the [API Playbook](https://playbook.hackney.gov.uk/API-Playbook/lambda_authoriser) for details.
 
 ### Instructions
 
-To use the `UseGoogleGroupAuthorization` middleware, add the following line of code to your `Configure(...)` method in the `Startup.cs` file:
+To use the `UseGoogleGroupAuthorization` middleware, add the following line to your `Configure(...)` method in `Startup.cs`:
 
 ```csharp
 	app.UseGoogleGroupAuthorization();
@@ -113,10 +195,4 @@ To use the `UseGoogleGroupAuthorization` middleware, add the following line of c
 This middleware will use `REQUIRED_GOOGL_GROUPS` environment valiable to get required Google groups list.
 
 ### Testing
-To test the authorization filters, you can follow these steps:
-
-1. Create a mock JWT token for a fake user with some fake Google groups in it.
-2. Set your environment variable to include the same Google groups as the ones in the JWT token.
-3. Change either the environment variable or the JWT token to have a Google group that doesn't match the other.
-
-This will allow you to test the authorization filters by simulating different scenarios and verifying that the access to the endpoints is limited correctly.
+The testing process for `AuthorizeEndpointByIpWhitelist` is similar to that of `AuthorizeEndpointByGroups`. For detailed instructions on how to conduct these tests, please refer to the [Testing section](#testing).
