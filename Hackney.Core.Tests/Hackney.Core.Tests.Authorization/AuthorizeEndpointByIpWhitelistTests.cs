@@ -52,29 +52,25 @@ namespace Hackney.Core.Authorization.Tests
         }
 
         [Fact]
-        public void ShouldAllowRequestFromWhitelistedIpInHeader()
+        public void OnAuthorization_ReturnsUnauthorizedResult_WhenRemoteIpIsNull()
         {
-            _requestHeaders["X-Forwarded-For"] = _whitelistedIp;
+            // Arrange
+            _mockHttpContext.Setup(x => x.Connection.RemoteIpAddress)
+                .Returns((IPAddress)null);
+
+            // Act
             _classUnderTest.OnAuthorization(_context);
 
-            _context.Result.Should().BeNull();
-            _logger.VerifyExact(LogLevel.Information, $"Request from Remote IP address: {_whitelistedIp}", Times.Once());
-        }
-
-        [Fact]
-        public void ShouldDenyRequestFromNonWhitelistedIpInHeader()
-        {
-            var remoteIp = "135.135.75.55";
-            _requestHeaders["X-Forwarded-For"] = remoteIp;
-            _classUnderTest.OnAuthorization(_context);
-
+            // Assert
+            var result = _context.Result;
             _context.Result.Should().BeOfType(typeof(UnauthorizedObjectResult));
-            (_context.Result as UnauthorizedObjectResult).Value.Should().Be($"IP Address {remoteIp} is not authorized to access this endpoint.");
-            _logger.VerifyExact(LogLevel.Warning, $"Forbidden Request from Remote IP address: {remoteIp}", Times.Once());
+            (_context.Result as UnauthorizedObjectResult)?.Value.Should().Be("Remote IP address is null.");
+            _logger.VerifyExact(LogLevel.Error, "Failed to retrieve Remote IP address.", Times.Once());
         }
 
+
         [Fact]
-        public void ShouldAllowRequestFromWhitelistedIpInConnection()
+        public void ShouldAllowRequestFromWhitelistedIp()
         {
             _mockHttpContext.Setup(x => x.Connection.RemoteIpAddress)
                 .Returns(IPAddress.Parse(_whitelistedIp));
@@ -85,7 +81,7 @@ namespace Hackney.Core.Authorization.Tests
         }
 
         [Fact]
-        public void ShouldDenyRequestFromNonWhitelistedIpInConnection()
+        public void ShouldDenyRequestFromNonWhitelistedIp()
         {
             var remoteIp = "135.135.75.55";
             _mockHttpContext.Setup(x => x.Connection.RemoteIpAddress)
@@ -93,7 +89,7 @@ namespace Hackney.Core.Authorization.Tests
             _classUnderTest.OnAuthorization(_context);
 
             _context.Result.Should().BeOfType(typeof(UnauthorizedObjectResult));
-            (_context.Result as UnauthorizedObjectResult).Value.Should().Be($"IP Address {remoteIp} is not authorized to access this endpoint.");
+            (_context.Result as UnauthorizedObjectResult)?.Value.Should().Be($"IP Address {remoteIp} is not authorized to access this endpoint.");
             _logger.VerifyExact(LogLevel.Warning, $"Forbidden Request from Remote IP address: {remoteIp}", Times.Once());
         }
     }

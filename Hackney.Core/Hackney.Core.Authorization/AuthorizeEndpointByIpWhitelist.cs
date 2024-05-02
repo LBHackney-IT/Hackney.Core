@@ -43,7 +43,14 @@ namespace Hackney.Core.Authorization
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var remoteIp = context.HttpContext.Connection.RemoteIpAddress.ToString();
+            var remoteIp = context.HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (remoteIp == null)
+            {
+                _logger.LogError("Failed to retrieve Remote IP address.");
+                context.Result = new UnauthorizedObjectResult("Remote IP address is null.");
+                return;
+            }
+
             _logger.LogInformation("Request from Remote IP address: {RemoteIp}", remoteIp);
 
             if (!_whitelist.Contains(remoteIp))
