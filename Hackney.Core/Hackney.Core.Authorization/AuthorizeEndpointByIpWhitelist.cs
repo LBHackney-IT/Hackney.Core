@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Hackney.Core.Authorization.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -27,7 +28,7 @@ namespace Hackney.Core.Authorization
     /// </summary>
     public class IpWhitelistFilter : IAuthorizationFilter
     {
-        private readonly HashSet<string> _whitelist;
+        public readonly List<string> Whitelist;
         private readonly ILogger<IpWhitelistFilter> _logger;
 
         public IpWhitelistFilter(ILogger<IpWhitelistFilter> logger, string ipWhitelistVariableName)
@@ -37,8 +38,9 @@ namespace Hackney.Core.Authorization
             var whitelist = Environment.GetEnvironmentVariable(ipWhitelistVariableName)
                 ?? throw new EnvironmentVariableNullException(ipWhitelistVariableName);
 
+            whitelist = Regex.Replace(whitelist, @"\s+", ""); // remove any whitespace
             var ips = whitelist.Split(';');
-            _whitelist = new HashSet<string>(ips); // Note: Env variable must not have spaces after semi-colons
+            Whitelist = new List<string>(ips);
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
@@ -53,7 +55,7 @@ namespace Hackney.Core.Authorization
 
             _logger.LogInformation("Request from Remote IP address: {RemoteIp}", remoteIp);
 
-            if (!_whitelist.Contains(remoteIp))
+            if (!Whitelist.Contains(remoteIp))
             {
                 _logger.LogWarning(
                     "Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);

@@ -24,14 +24,14 @@ namespace Hackney.Core.Authorization.Tests
         private HeaderDictionary _requestHeaders = new HeaderDictionary();
         private Mock<HttpContext> _mockHttpContext = new Mock<HttpContext>();
 
-        private readonly string _whitelistEnvVar = "WHITELIST";
+        private readonly string _whitelistEnvVarName = "WHITELIST";
         private readonly string _whitelistedIp = "192.168.1.1";
 
         public AuthorizeEndpointByIpWhitelistTests()
         {
-            Environment.SetEnvironmentVariable(_whitelistEnvVar, _whitelistedIp);
+            Environment.SetEnvironmentVariable(_whitelistEnvVarName, _whitelistedIp);
             _logger = new Mock<ILogger<IpWhitelistFilter>>();
-            _classUnderTest = new IpWhitelistFilter(_logger.Object, _whitelistEnvVar);
+            _classUnderTest = new IpWhitelistFilter(_logger.Object, _whitelistEnvVarName);
 
             SetUpMockContextAndHeaders();
         }
@@ -49,6 +49,17 @@ namespace Hackney.Core.Authorization.Tests
             var missingVar = "MISSING_VARIABLE";
             Func<IpWhitelistFilter> func = () => new IpWhitelistFilter(_logger.Object, missingVar);
             func.Should().Throw<EnvironmentVariableNullException>().WithMessage($"Cannot resolve {missingVar} environment variable.");
+        }
+
+        [Fact]
+        public void ConstructorRemovesWhitespaceFromWhitelist()
+        {
+            var ipListWithWhitespace = _whitelistedIp.Insert(3, " ");
+            Environment.SetEnvironmentVariable(_whitelistEnvVarName, ipListWithWhitespace);
+
+            _classUnderTest = new IpWhitelistFilter(_logger.Object, _whitelistEnvVarName);
+
+            _classUnderTest.Whitelist.Should().ContainSingle().Which.Should().Be(_whitelistedIp);
         }
 
         [Fact]
