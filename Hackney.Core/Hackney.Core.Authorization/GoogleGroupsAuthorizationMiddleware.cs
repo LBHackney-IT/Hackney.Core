@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Hackney.Core.Authorization.Exceptions;
 
 namespace Hackney.Core.Authorization
 {

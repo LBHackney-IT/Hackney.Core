@@ -36,7 +36,7 @@ then have filenames longer than that traditionally supported by Windows.
 This can be fixed by enabling long paths in the Windows registry using [these instructions](https://docs.microsoft.com/en-gb/windows/win32/fileio/maximum-file-path-limitation?tabs=cmd#enable-long-paths-in-windows-10-version-1607-and-later). 
 Once enabled it will take effect *without* needing to restart Visual Studio.
 
-## Using the package
+## Using the packages
 For full details on how to use the package(s) within this repository please read 
 [this wiki page](https://github.com/LBHackney-IT/lbh-core/wiki/Using-the-package(s)-from-the-Hackney.Core-repository).
 
@@ -48,30 +48,31 @@ Please refer to [our documentation](https://docs.google.com/document/d/1aJzhNxmS
 
 ## Features
 
-The following features are implemented within this package.
-* [MVC Middleware](#MVC-Middleware)
-  * [Correlation middleware](#correlation-middleware])
-  * [Exception middleware](#Exception-middleware)
+The following features are implemented within this package (Alphabetical Order):
+* [Authorisation](/Hackney.Core/Hackney.Core.Authorization/README.md)
 * [DynamoDb](#DynamoDb)
-  * [Converters](#Converters)
-  * [Paged results](#Paged-results)
-  * [Health check](#DynamoDb-Health-check)
+    * [Converters](#Converters)
+    * [Health check](#DynamoDb-Health-check)
+    * [Paged results](#Paged-results)
 * [ElasticSearch](/Hackney.Core/Hackney.Core.ElasticSearch/README.md)
 * [Enums](/Hackney.Core/Hackney.Core.Enums/README.md)
 * [Health check helpers](#Health-check-helpers)
 * [Http](/Hackney.Core/Hackney.Core.Http/README.md)
 * [JWT](#JWT)
-  * [Token Factory](#Token-Factory)
+    * [Token Factory](#Token-Factory)
 * [Logging](#Logging)
-  * [Lambda logging](#Lambda-logging)
+    * [Lambda logging](#Lambda-logging)
+* [MVC Middleware](#MVC-Middleware)
+    * [Correlation middleware](#correlation-middleware])
+    * [Exception middleware](#Exception-middleware)
 * [Sns](/Hackney.Core/Hackney.Core.Sns/README.md)
+* Testing
+    * [Hackney.Core.Testing.DynamoDb](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.DynamoDb/README.md)
+    * [Hackney.Core.Testing.PactBroker](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.PactBroker/README.md)
+    * [Hackney.Core.Testing.Shared](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.Shared/README.md)
+    * [Hackney.Core.Testing.Sns](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.Sns/README.md)
 * [Validation](/Hackney.Core/Hackney.Core.Validation/README.md)
 * [Validation.AspNet](/Hackney.Core/Hackney.Core.Validation.AspNet/ReadMe.md)
-* Testing
-  * [Hackney.Core.Testing.DynamoDb](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.DynamoDb/README.md)
-  * [Hackney.Core.Testing.PactBroker](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.PactBroker/README.md)
-  * [Hackney.Core.Testing.Shared](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.Shared/README.md)
-  * [Hackney.Core.Testing.Sns](/Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.Sns/README.md)
 
 ### MVC Middleware
 

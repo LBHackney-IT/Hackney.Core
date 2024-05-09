@@ -1,4 +1,4 @@
-namespace Hackney.Core.Authorization
+namespace Hackney.Core.Authorization.Exceptions
 {
     public class EnvironmentVariableNullException : System.Exception
     {
