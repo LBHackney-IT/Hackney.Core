@@ -38,7 +38,7 @@ namespace Hackney.Core.Tests.DynamoDb
         [Fact]
         public void ConfigureDynamoDBTestRegistersServices()
         {
-            string url = "http://localhost:8000";
+            string url = "http://localhost:8000/";
             Environment.SetEnvironmentVariable("DynamoDb_LocalServiceUrl", url);
             Environment.SetEnvironmentVariable("DynamoDb_LocalMode", "true");
 
