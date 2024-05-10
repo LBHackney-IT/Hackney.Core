@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	 <PackageReference Include="AWSSDK.DynamoDBv2" Version=" 3.7.303.2" />
+	 <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.303.2" />
 	 <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.0.1" />
 	 <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.2.7" />
 	 <PackageReference Include="System.Text.Json" Version="5.0.2" />
