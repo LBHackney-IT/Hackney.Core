@@ -38,18 +38,15 @@ namespace Hackney.Core.Testing.DynamoDb
             GC.SuppressFinalize(this);
         }
 
-        private bool _disposed;
+        private bool _disposedAsync;
         protected virtual async Task DisposeAsync(bool disposing)
         {
-            if (disposing && !_disposed)
+            if (disposing && !_disposedAsync)
             {
-                var cleanupTasks = new List<Task>();
-                foreach (var act in _cleanup)
-                    cleanupTasks.Add(act());
+                var tasks = _cleanup.Select(x => x.Invoke());
+                await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                await Task.WhenAll(cleanupTasks).ConfigureAwait(false);
-
-                _disposed = true;
+                _disposedAsync = true;
             }
         }
 
