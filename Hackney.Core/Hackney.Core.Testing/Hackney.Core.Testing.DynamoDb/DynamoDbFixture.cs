@@ -24,7 +24,7 @@ namespace Hackney.Core.Testing.DynamoDb
         /// </summary>
         public IAmazonDynamoDB DynamoDb { get; private set; }
 
-        private static List<Action> _cleanup = new List<Action>();
+        private static List<Func<Task>> _cleanup = new List<Func<Task>>();
 
         public DynamoDbFixture(IDynamoDBContext dynamoDbContext, IAmazonDynamoDB dynamoDb)
         {
@@ -32,19 +32,22 @@ namespace Hackney.Core.Testing.DynamoDb
             DynamoDbContext = dynamoDbContext;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await DisposeAsync(true).ConfigureAwait(false);
             GC.SuppressFinalize(this);
         }
 
         private bool _disposed;
-        protected virtual void Dispose(bool disposing)
+        protected virtual async Task DisposeAsync(bool disposing)
         {
             if (disposing && !_disposed)
             {
+                var cleanupTasks = new List<Task>();
                 foreach (var act in _cleanup)
-                    act();
+                    cleanupTasks.Add(act());
+
+                await Task.WhenAll(cleanupTasks).ConfigureAwait(false);
 
                 _disposed = true;
             }
