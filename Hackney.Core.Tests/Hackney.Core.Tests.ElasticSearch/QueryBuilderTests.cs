@@ -66,6 +66,26 @@ namespace Hackney.Core.Tests.ElasticSearch
         }
 
         [Fact]
+        public void WhenCreatingQuery_WithWildstarBool_ResultantQueryShouldHaveOneSubquery()
+        {
+            // Arrange 
+            string searchText = "8 Westminster Lane";
+            var fields = new List<string> { "field1", "field2" };
+            _wildcardAppenderAndPrependerMock.Setup(x => x.Process(It.IsAny<string>()))
+                .Returns(new List<string> { "*8*", "*Westminster*", "*Lane*" });
+
+            // Act
+            QueryContainer query = _sut.WithWildstarBoolQuery(searchText, fields)
+                .Build(_queryContainerDesc);
+
+            // Assert
+            var container = (query as IQueryContainer).Bool.Should;
+
+            Assert.Equal(2, container.Count());
+            Assert.Equal(1, container.Count(q => q != null));
+        }
+
+        [Fact]
         public void WhenCreatingSimpleQuery_WithWildstar_ResultantQueryBeOfSimpleType()
         {
             // Arrange 
