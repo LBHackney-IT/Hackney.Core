@@ -7,8 +7,6 @@ namespace Hackney.Core.ElasticSearch.Interfaces
     {
         public IQueryBuilder<T> WithWildstarQuery(string searchText, List<string> fields, TextQueryType textQueryType = TextQueryType.MostFields);
 
-        public IQueryBuilder<T> WithWildstarBoolQuery(string searchText, List<string> fields, int? minimumShouldMatch = null, TextQueryType textQueryType = TextQueryType.MostFields);
-
         public IQueryBuilder<T> WithFilterQuery(string commaSeparatedFilters, List<string> fields, TextQueryType textQueryType = TextQueryType.MostFields);
 
         public IQueryBuilder<T> WithExactQuery(string searchText, List<string> fields, IExactSearchQuerystringProcessor processor = null, TextQueryType textQueryType = TextQueryType.MostFields);

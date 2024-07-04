@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Hackney.Core.ElasticSearch.Interfaces;
 using Nest;
 
@@ -28,6 +29,16 @@ namespace Hackney.Core.ElasticSearch
 
             return this;
         }
+
+        public IQueryBuilder<T> WithWildstarBoolQuery(string searchText, List<string> fields, int? minimumShouldMatch = 1, TextQueryType textQueryType = TextQueryType.MostFields)
+        {
+            var listOfWildCardedWords = _wildCardAppenderAndPrepender.Process(searchText);
+
+            _wildstarQuery = CreateWildcardBoolQuery(listOfWildCardedWords, fields);
+
+            return this;
+        }
+
 
         public IQueryBuilder<T> WithFilterQuery(string commaSeparatedFilters, List<string> fields, TextQueryType textQueryType = TextQueryType.MostFields)
         {
@@ -106,6 +117,28 @@ namespace Hackney.Core.ElasticSearch
                     return f;
                 }
             ).Query(searchTerm));
+        }
+
+        private static Func<QueryContainerDescriptor<T>, QueryContainer> CreateWildcardBoolQuery(
+                    List<string> words, List<string> fields)
+        {
+            Func<QueryContainerDescriptor<T>, QueryContainer> query =
+                (containerDescriptor) => containerDescriptor.Bool(b => b
+                    .Should(fields.Select(field =>
+                        (QueryContainer)new BoolQuery
+                        {
+                            Should = words.Select(word =>
+                                (QueryContainer)new WildcardQuery
+                                {
+                                    Value = word,
+                                    Field = field
+                                }).ToList(),
+                            MinimumShouldMatch = words.Count
+                        }).ToArray()
+                    )
+                );
+
+            return query;
         }
     }
 }
