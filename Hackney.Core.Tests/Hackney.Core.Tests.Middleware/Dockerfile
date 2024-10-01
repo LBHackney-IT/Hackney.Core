@@ -20,8 +20,8 @@ COPY /nuget.config /root/.nuget/NuGet/NuGet.Config
 #   - https://docs.docker.com/compose/how-tos/use-secrets/ 
 RUN --mount=type=secret,id=LBHPACKAGESTOKEN \
   export LBHPACKAGESTOKEN=$(cat /run/secrets/LBHPACKAGESTOKEN) && \
-  dotnet restore ./Hackney.Core/Hackney.Core.Middleware/Hackney.Core.Middleware.csproj) && \
-  dotnet restore ./Hackney.Core.Tests/Hackney.Core.Tests.Middleware/Hackney.Core.Tests.Middleware.csproj) && \
+  dotnet restore ./Hackney.Core/Hackney.Core.Middleware/Hackney.Core.Middleware.csproj && \
+  dotnet restore ./Hackney.Core.Tests/Hackney.Core.Tests.Middleware/Hackney.Core.Tests.Middleware.csproj && \
   dotnet restore ./Hackney.Core/Hackney.Core.Testing/Hackney.Core.Testing.Shared/Hackney.Core.Testing.Shared.csproj
 
 # Copy everything else and build
