@@ -60,9 +60,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-enums-test
+        run: docker compose build hackney-core-enums-test
       - name: Run tests
-        run: docker-compose run hackney-core-enums-test
+        run: docker compose run hackney-core-enums-test
 
   publish-package:
     name: Publish Package

@@ -60,9 +60,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-jwt-test
+        run: docker compose build hackney-core-jwt-test
       - name: Run tests
-        run: docker-compose run hackney-core-jwt-test
+        run: docker compose run hackney-core-jwt-test
 
   publish-package:
     name: Publish Package

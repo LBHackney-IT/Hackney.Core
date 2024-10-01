@@ -60,7 +60,7 @@ jobs:
       # - name: Checkout
         # uses: actions/checkout@v2
       # - name: Build
-        # run: docker-compose build hackney-shared-strings      
+        # run: docker compose build hackney-shared-strings      
 
   publish-package:
     name: Publish Package

@@ -60,9 +60,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-http-test
+        run: docker compose build hackney-core-http-test
       - name: Run tests
-        run: docker-compose run hackney-core-http-test
+        run: docker compose run hackney-core-http-test
 
   publish-package:
     name: Publish Package

@@ -60,9 +60,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-authorization-test
+        run: docker compose build hackney-core-authorization-test
       - name: Run tests
-        run: docker-compose run hackney-core-authorization-test
+        run: docker compose run hackney-core-authorization-test
 
   publish-authorization-package:
     name: Publish Authorization Package
