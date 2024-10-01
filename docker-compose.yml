@@ -7,95 +7,100 @@ services:
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Authorization/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-dynamodb-test:
     image: hackney-core-dynamodb-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.DynamoDb/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-elasticsearch-test:
     image: hackney-core-elasticsearch-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.ElasticSearch/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-enums-test:
     image: hackney-core-enums-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Enums/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-healthcheck-test:
     image: hackney-core-healthcheck-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.HealthCheck/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
         
   hackney-core-http-test:
     image: hackney-core-http-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Http/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-jwt-test:
     image: hackney-core-jwt-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.JWT/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
-  
+      secrets:
+        - LBHPACKAGESTOKEN
+
   hackney-core-logging-test:
     image: hackney-core-logging-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Logging/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+      secrets:
+        - LBHPACKAGESTOKEN
   
   hackney-core-middleware-test:
     image: hackney-core-middleware-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Middleware/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
-      
+      secrets:
+        - LBHPACKAGESTOKEN
+
   hackney-core-sns-test:
     image: hackney-core-sns-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Sns/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
-  
+      secrets:
+        - LBHPACKAGESTOKEN
+
   hackney-core-validation-test:
     image: hackney-core-validation-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Validation/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
-  
+      secrets:
+        - LBHPACKAGESTOKEN
 
   hackney-core-validation-aspnet-test:
     image: hackney-core-validation-aspnet-test
     build:
       context: .
       dockerfile: Hackney.Core.Tests/Hackney.Core.Tests.Validation.AspNet/Dockerfile
-      args:
-        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
-      
+      secrets:
+        - LBHPACKAGESTOKEN
+
+# see https://docs.docker.com/compose/how-tos/use-secrets/#build-secrets
+# Combines with a "secrets" block in each service to expose it as a file in
+# /run/secrets/, e.g. /run/secrets/LBHPACKAGESTOKEN
+secrets:
+  LBHPACKAGESTOKEN:
+    environment: LBHPACKAGESTOKEN
