@@ -12,8 +12,6 @@ jobs:
   calculate-version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     outputs:
       version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
     steps:
@@ -38,8 +36,6 @@ jobs:
     name: Check code formatting
     runs-on: ubuntu-latest
     needs: calculate-version
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,16 +53,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: calculate-version
     env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
     outputs:
       version: ${{ needs.calculate-version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-validation-aspnet-test
+        run: docker compose build hackney-core-validation-aspnet-test
       - name: Run tests
-        run: docker-compose run hackney-core-validation-aspnet-test
+        run: docker compose run hackney-core-validation-aspnet-test
 
   publish-package:
     name: Publish Package
@@ -74,7 +70,7 @@ jobs:
     needs: build-and-test
     env:
       VERSION: ${{ needs.build-and-test.outputs.version }}
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -85,4 +81,4 @@ jobs:
       - name: Publish the Package
         run: |
           cd Hackney.Core/Hackney.Core.Validation.AspNet/bin/Release
-          dotnet nuget push Hackney.Core.Validation.AspNet.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.NUGET_KEY }}
+          dotnet nuget push Hackney.Core.Validation.AspNet.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.GITHUB_TOKEN }}

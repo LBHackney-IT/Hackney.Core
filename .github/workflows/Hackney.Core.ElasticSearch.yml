@@ -12,8 +12,6 @@ jobs:
   calculate-version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     outputs:
       version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
     steps:
@@ -38,8 +36,6 @@ jobs:
     name: Check code formatting
     runs-on: ubuntu-latest
     needs: calculate-version
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,24 +53,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: calculate-version
     env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
     outputs:
       version: ${{ needs.calculate-version.outputs.version }}
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker-compose build hackney-core-elasticsearch-test
+        run: docker compose build hackney-core-elasticsearch-test
       - name: Run tests
-        run: docker-compose run hackney-core-elasticsearch-test
+        run: docker compose run hackney-core-elasticsearch-test
 
   publish-package:
     name: Publish Package
     runs-on: ubuntu-latest
     needs: build-and-test
     env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
       VERSION: ${{ needs.build-and-test.outputs.version }}
     steps:
       - name: Checkout
@@ -86,4 +81,4 @@ jobs:
       - name: Publish the Package
         run: |
           cd Hackney.Core/Hackney.Core.ElasticSearch/bin/Release
-          dotnet nuget push Hackney.Core.ElasticSearch.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.NUGET_KEY }}
+          dotnet nuget push Hackney.Core.ElasticSearch.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.GITHUB_TOKEN }}

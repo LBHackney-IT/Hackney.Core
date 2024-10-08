@@ -12,8 +12,6 @@ jobs:
   calculate-version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     outputs:
       version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
     steps:
@@ -38,8 +36,6 @@ jobs:
     name: Check code formatting
     runs-on: ubuntu-latest
     needs: calculate-version
-    env:
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,14 +53,14 @@ jobs:
     # runs-on: ubuntu-latest
     # needs: calculate-version
     # env:
-      # LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      # LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
     # outputs:
       # version: ${{ needs.calculate-version.outputs.version }}
     # steps:
       # - name: Checkout
         # uses: actions/checkout@v2
       # - name: Build
-        # run: docker-compose build hackney-shared-strings      
+        # run: docker compose build hackney-shared-strings      
 
   publish-package:
     name: Publish Package
@@ -72,7 +68,7 @@ jobs:
     needs: calculate-version
     env:
       VERSION: ${{ needs.calculate-version.outputs.version }}
-      LBHPACKAGESTOKEN: ${{secrets.LBHPACKAGESTOKEN }}
+      LBHPACKAGESTOKEN: ${{secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -83,4 +79,4 @@ jobs:
       - name: Publish the Package
         run: |
           cd Hackney.Shared/Hackney.Shared.Strings/bin/Release
-          dotnet nuget push Hackney.Shared.Strings.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.NUGET_KEY }}
+          dotnet nuget push Hackney.Shared.Strings.*.nupkg -s https://nuget.pkg.github.com/LBHackney-IT/index.json --api-key ${{secrets.GITHUB_TOKEN }}
